@@ -1,0 +1,41 @@
+div.TaskList {
+  max-width: 30em;
+}
+
+ul.TaskListGroup {
+  padding: 0;
+}
+
+ul.TaskListGroup li {
+  list-style: none;
+  background-color: lightgrey;
+  padding: 0.5em;
+  margin: 0.2em;
+  border-radius: 5px;
+}
+
+ul.TaskListGroup li span.status {
+  float: left;
+  padding: 0 1em;
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #888;
+}
+
+ul.TaskListGroup li.overdue span.status {
+  background-color: #FF5555;
+}
+
+ul.TaskListGroup li.duesoon span.status {
+  background-color: #FFFF55;
+}
+
+ul.TaskListGroup li.duelater span.status {
+  background-color: #55FF55;
+}
+
+ul.TaskListGroup li span.nav {
+  float: right;
+  padding: 0 1em;
+}

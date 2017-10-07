@@ -1,0 +1,24 @@
+nav.NavBar {
+  margin: 0;
+  padding: 0;
+  background-color: #444;
+
+  /* Fill with floated children */
+  overflow: hidden;
+  height: 100%;
+}
+
+nav.NavBar > a {
+  float: left;
+  margin: 0;
+  padding: 0.5em;
+  background-color: #444;
+  text-decoration: none;
+  color: #fff;
+}
+
+nav.NavBar > a:hover,
+nav.NavBar > a.active {
+  background-color: #fff;
+  color: #444;
+}

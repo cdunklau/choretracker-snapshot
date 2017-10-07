@@ -1,0 +1,38 @@
+div.TasksDueStatusSummary {
+  margin: 0;
+  padding: 0;
+  clear: left;
+}
+
+div.TasksDueStatusSummary > ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+
+  /* Fill with the floated children */
+  overflow: hidden;
+  height: 100%;
+}
+
+div.TasksDueStatusSummary > ul > li {
+  float: left;
+  padding: 0.5em;
+  margin: 0.2em;
+  border-radius: 5px;
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+}
+
+div.TasksDueStatusSummary > ul > li.overdue {
+  background-color: #FF5555;
+  color: #fff;
+}
+div.TasksDueStatusSummary > ul > li.duesoon {
+  background-color: #FFFF55;
+  color: #000;
+}
+div.TasksDueStatusSummary > ul > li.duelater {
+  background-color: #55FF55;
+  color: #000;
+}

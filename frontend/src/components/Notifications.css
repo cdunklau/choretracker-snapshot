@@ -1,0 +1,54 @@
+div.Notifications {
+  display: block;
+  position: fixed;
+  bottom: 0;
+  padding: 0;
+  margin: 0;
+}
+
+div.Notifications > ul {
+  padding: 0;
+  margin: 0;
+}
+
+div.Notifications > ul > li {
+  list-style: none;
+  padding: 0.5em;
+  margin: 0.2em;
+  border-radius: 5px;
+  background-color: #000;
+  color: #fff;
+  text-align: right;
+  position: relative;
+  left: 0;
+}
+div.Notifications > ul > li.InfoNotification {
+  background-color: #82b5ff;
+  color: #888;
+}
+div.Notifications > ul > li.ErrorNotification {
+  background-color: #ff8482;
+  color: #888;
+}
+
+div.Notifications > ul > li:first-child {
+  animation-duration: 0.5s;
+  animation-name: bounceToLeft;
+  /* TODO: Figure out how to make this more bouncy */
+  /*
+  animation-timing-function: cubic-bezier(0, 0.4, 1, 0.5);
+  animation-timing-function: ease-out;
+  */
+  animation-timing-function: linear;
+}
+@keyframes bounceToLeft {
+  from {
+    left: 30px;
+  }
+  40% {
+    left: 0;
+  }
+  70% {
+    left: 10px;
+  }
+}
