@@ -1,6 +1,14 @@
 import React from 'react';
-import { mirrorKeys, pascalCaseify } from '../utils';
+import mirrorKeys from '../util/mirrorKeys';
 
+function pascalCaseify(s) {
+  const words = s.trim().split(/\s+/);
+  const toJoin = words.map((word) => {
+    const lower = word.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  });
+  return toJoin.join('');
+}
 
 const ButtonTypes = mirrorKeys({
   EDIT: null,

@@ -1,5 +1,5 @@
 import ActionTypes from './ActionTypes';
-import { mirrorKeys } from '../utils';
+import mirrorKeys from '../util/mirrorKeys';
 
 const Levels = mirrorKeys({
   INFO: null,
@@ -17,9 +17,12 @@ function showNotification(message, level) {
       id: newId,
       level: level,
     };
+    if (level === Levels.ERROR) {
+      console.log(`${ level } notification: ${ message }`);
+    }
     dispatch({
       type: ActionTypes.SHOW_NOTIFICATION,
-      payload: { notification }
+      payload: { notification },
     });
     // TODO: Ensure this doesn't blow up if user dismissed the notification
     setTimeout(function() {

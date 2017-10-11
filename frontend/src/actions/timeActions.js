@@ -1,9 +1,8 @@
-import moment from 'moment';
-
+import { nowUnix } from '../util/time';
 import ActionTypes from './ActionTypes';
 
 function updateTimeReference() {
-  const now = moment();
+  const now = nowUnix();
   return {
     type: ActionTypes.UPDATE_TIME_REFERENCE,
     payload: now,

@@ -1,29 +1,28 @@
-import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 
+import { combineMappableReducers, symmetricStateMapSpec } from './util/state';
 import ActionTypes from './actions/ActionTypes';
-import { shallowCloneOmitting, shallowCloneReplacing } from './utils';
+import {
+  shallowCloneOmitting, shallowCloneReplacing, objectFromArray
+} from './util/transform';
 import makeInitialState from './makeInitialState';
 
 const initialState = makeInitialState();
 
-function rootReducer(state = initialState, action) {
-  const tasksById = changedTasks(state.tasksById, action);
-  const tasksOrderedByDue = computeOrderedByDue(tasksById);
-  const notifications = computeNotifications(state.notifications, action);
-  const timeReference = updateTimeReference(state.timeReference, action);
-  const router = routerReducer(state.router);
-  return {
-    ...state,
-    tasksOrderedByDue,
-    tasksById,
-    notifications,
-    timeReference,
-    router,
-  };
-}
+const rootReducer = combineMappableReducers([
+  symmetricStateMapSpec('tasksById', changedTasks),
+  {
+    from: 'tasksById',
+    via: computeOrderedByDue,
+    to: 'tasksOrderedByDue',
+  },
+  symmetricStateMapSpec('notifications', computeNotifications),
+  symmetricStateMapSpec('timeReference', updateTimeReference),
+  symmetricStateMapSpec('router', routerReducer),
+], initialState);
 
 function computeOrderedByDue(tasksById) {
+  // TODO: Reduce this churn by only triggering on relevant action types.
   return Object.keys(tasksById)
     .sort((id1, id2) => compareTaskByDue(tasksById, id1, id2));
 }
@@ -42,17 +41,16 @@ function compareTaskByDue(tasksById, id1, id2) {
 
 function changedTasks(tasksById, action) {
   switch (action.type) {
-    case ActionTypes.CREATE_TASK:
-      const newTask = action.payload.task;
-      return shallowCloneReplacing(tasksById, newTask.id, newTask);
-    case ActionTypes.UPDATE_TASK:
-      // TODO: Don't clone so damn much
-      return shallowCloneReplacing(
-        tasksById, action.payload.taskId,
-        shallowCloneReplacing(action.payload.task, 'id', action.payload.taskId),
-      );
-    case ActionTypes.DELETE_TASK:
+    case ActionTypes.DELETE_TASK_SUCCESS:
       return shallowCloneOmitting(tasksById, action.payload.taskId);
+    case ActionTypes.CREATE_TASK_SUCCESS:
+    case ActionTypes.UPDATE_TASK_SUCCESS:
+    case ActionTypes.FETCH_TASK_SUCCESS:
+      return shallowCloneReplacing(
+        tasksById, action.payload.task.id, action.payload.task);
+    // TODO: Figure out what to do with initial request and failure case
+    case ActionTypes.FETCH_ALL_TASKS_SUCCESS:
+      return objectFromArray(action.payload.tasks, (item) => [ item.id, item ]);
     default:
       return tasksById;
   }

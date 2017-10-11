@@ -1,19 +1,9 @@
-// For now just use in-browser state entirely, don't try to add
-// the complexities of async
-import moment from 'moment';
-import { genDatabase } from './DummyData';
+import { nowUnix } from './util/time';
 
 export default function makeInitialState() {
-  const db = genDatabase()
-  const tasks = db.getAllTasks()
-  const tasksById = {};
-  const now = moment();
-  tasks.forEach((task) => {
-    task.due = moment(task.due);
-    tasksById[task.id] = task;
-  });
+  const now = nowUnix();
   return {
-    tasksById: tasksById,
+    tasksById: {},
     tasksOrderedByDue: [],
     lastTaskAction: {},
     // A notification has id and message properties

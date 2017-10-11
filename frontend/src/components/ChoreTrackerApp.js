@@ -1,14 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Route } from 'react-router-dom';
 
 import { TaskCreator, RedirectingTaskEditor } from './TaskEditor';
 import { RedirectingTaskDetails } from './TaskDetails';
-import { TaskList } from './TaskList';
+import TaskList from './TaskList';
 import Notifications from './Notifications';
 import NavBar from './NavBar';
 import TimeReferenceUpdater from './TimeReferenceUpdater';
+import ApiWrangler from './ApiWrangler';
 import TasksDueStatusSummary from './TasksDueStatusSummary';
+import { intIdPattern } from '../constants';
 
 import logo from '../logo.svg';
 import './ChoreTrackerApp.css';
@@ -60,15 +61,10 @@ const routes = [
   */
 ];
 
-
-// Can't use groups in a path-to-regexp pattern apparently
-const uuidPattern =
-  '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
-
-
 function ChoreTrackerApp(props) {
   return (
     <div className="ChoreTrackerApp">
+      <ApiWrangler />
       <TimeReferenceUpdater intervalSeconds={ 10 } />
 
       <header className="ChoreTrackerApp-header">
@@ -85,10 +81,10 @@ function ChoreTrackerApp(props) {
       <Route exact path="/tasks" component={ TaskList } />
       <Route exact path="/tasks/new" component={ TaskCreator } />
       <Route
-        exact path={ `/tasks/:taskId(${ uuidPattern })` }
+        exact path={ `/tasks/:taskId(${ intIdPattern })` }
         component={ RedirectingTaskDetails } />
       <Route
-        exact path={ `/tasks/:taskId(${ uuidPattern })/edit` }
+        exact path={ `/tasks/:taskId(${ intIdPattern })/edit` }
         component={ RedirectingTaskEditor } />
     </div>
   );

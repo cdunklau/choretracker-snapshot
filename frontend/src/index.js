@@ -11,12 +11,16 @@ import ChoreTrackerApp from './components/ChoreTrackerApp';
 import registerServiceWorker from './registerServiceWorker';
 import { rootReducer } from './reducers';
 
+import { patchApiClient } from './testutils/monkeypatchApiClient';
+
 const history = createHistory();
 
 const store = createStore(
   rootReducer,
   applyMiddleware(thunk, routerMiddleware(history)),
 );
+
+patchApiClient();
 
 ReactDOM.render(
   (

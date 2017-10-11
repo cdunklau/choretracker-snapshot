@@ -41,6 +41,8 @@ General Features:
 
 -   One-off tasks with name, description, due date/time
 -   Repeating tasks
+    -   Should we do this as a Recurrence? Would need to ensure that tasks
+        stick around maybe?
 -   Notifications via email, (facebook?)
 -   Calendar event generation and cancellation (ICS format and/or Google
     Calendar)
@@ -66,4 +68,30 @@ Stack:
 
 -   Postgres
 -   React
--   Django (+DRF?)
+-   Django (+DRF?) or Pyramid or Twisted or asyncio/aiohttp/asyncpg
+
+To Do
+=====
+
+Short-term
+++++++++++
+
+-   Condense various utility modules into ./src/utils/
+-   Update UI to display creation/modification timestamps.
+-   Add "state" field to tasks. Call it "completed" or something, or do we also
+    want to support in-progress? Calling it "status" and making it an enum
+    would make that feature nicer.
+-   Add tests (unit and behavioral).
+-   Publish to github.
+
+Mid-term
++++++++++
+
+-   Start work on backend.
+-   Integrate a CSS framework (with SASS support).
+-   Implement auth: Google, Facebook, username/password
+
+Long-term
++++++++++
+
+-   Figure out and implement repeating tasks

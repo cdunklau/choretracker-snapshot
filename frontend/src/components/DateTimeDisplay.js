@@ -1,14 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import moment from 'moment';
 
 function DateTimeDisplay({ value }) {
+  const m = moment.unix(value);
   return (
     <span className="DateTimeDisplay">
-      { value.format('LL') } at { value.format('LT') } (
-        { value.fromNow() }
+      { m.format('LL') } at { m.format('LT') } (
+        { m.fromNow() }
       )
     </span>
   );
 }
-// TODO: Add PropTypes
+DateTimeDisplay.propTypes = {
+  value: PropTypes.number.isRequired,
+};
 
 export default DateTimeDisplay

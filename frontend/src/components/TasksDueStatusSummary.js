@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { TaskType } from '../types';
-import taskUtils from '../taskUtils';
-import { DueCategoryNames, DueCategoryClasses } from '../constants';
-import { shallowCloneReplacing } from '../utils';
+import {
+  getDueCategory, DueCategoryNames, DueCategoryClasses
+} from '../dueCategorization';
+import { shallowCloneReplacing } from '../util/transform';
 
 import './TasksDueStatusSummary.css';
 
@@ -22,7 +23,7 @@ categories.forEach(catName => {
 
 function countByDueCategory(tasks, timeReference) {
   return tasks.reduce((counts, task) => {
-    const category = taskUtils.getDueCategory(task.due, timeReference);
+    const category = getDueCategory(task.due, timeReference);
     return shallowCloneReplacing(counts, category, counts[category] + 1);
   }, initialCounts);
 }
@@ -44,7 +45,7 @@ function TasksDueStatusSummaryImplementation({ tasksById, timeReference }) {
 }
 TasksDueStatusSummaryImplementation.propTypes = {
   tasksById: PropTypes.objectOf(TaskType).isRequired,
-  timeReference: PropTypes.object.isRequired,
+  timeReference: PropTypes.number.isRequired,
 };
 
 const TasksDueStatusSummary = connect(function mapStateToProps(state) {

@@ -1,88 +1,61 @@
-import moment from 'moment';
-import { genDatabase } from './DummyData';
-import { serializeDateTime } from './TimeUtil';
+import { serializeTask, deserializeTask } from './serializers';
 
-
-function makeDelayedPromise(delayMilliseconds, resolveValue, rejectValue) {
-  if (delayMilliseconds === undefined) {
-    delayMilliseconds = 250;
-  }
-  return new Promise((resolve, reject) => {
-    setTimeout(function() {
-      if (rejectValue === undefined) {
-        resolve(resolveValue);
-      } else {
-        reject(rejectValue)
-      }
-    }, delayMilliseconds);
-  });
-}
-
-function resolvingAfter(delayMilliseconds, resolvingTo) {
-  return makeDelayedPromise(delayMilliseconds, resolvingTo);
-}
-
-function rejectingAfter(delayMilliseconds, rejectingWith) {
-  return makeDelayedPromise(delayMilliseconds, null, rejectingWith);
-}
-
-class DummyAPIClient {
-  constructor() {
-    this._db = genDatabase();
-    this.getAllTasks = this.getAllTasks.bind(this);
-    this.getTask = this.getTask.bind(this);
+class ApiClient {
+  constructor(baseUrl = '/api/') {
+    this.baseUrl = baseUrl;
+    this.baseHeaders = new Headers();
+    this.baseHeaders.append('Accept', 'application/json');
+    this.fetchAllTasks = this.fetchAllTasks.bind(this);
+    this.fetchTask = this.fetchTask.bind(this);
+    this.createTask = this.createTask.bind(this);
     this.updateTask = this.updateTask.bind(this);
     this.deleteTask = this.deleteTask.bind(this);
   }
 
-  getAllTasks() {
-    const tasks = this._db.getAllTasks();
-    tasks.forEach(function(task) {
-      task.due = moment(task.due);
-    });
-    return resolvingAfter(500, tasks);
+  _fetchJSON(endpointPathComponents, method = 'GET', bodyStructure = null) {
+    const url = this.baseUrl + endpointPathComponents.join('/');
+    const init = {
+      method: method,
+      headers: this.baseHeaders,
+    };
+    if (bodyStructure !== null) {
+      if (method === 'GET' || method === 'DELETE') {
+        throw new TypeError('Sending body with GET or DELETE is not supported');
+      }
+      init.body = JSON.stringify(bodyStructure);
+      init.headers = new Headers(this.baseHeaders);
+      init.headers.append('Content-Type', 'application/json');
+    }
+    // TODO: Check status code
+    return fetch(url, init).then(response => response.json());
   }
 
-  getTask(taskId) {
-    const task = this._db.getTask(taskId);
-    if (task === null) {
-      return rejectingAfter(150, `No such task with id ${taskId}`);
-    } else {
-      task.due = moment(task.due);
-      return resolvingAfter(250, task);
-    }
+  fetchAllTasks() {
+    return this._fetchJSON(['tasks']).then(
+      taskStructureArray => taskStructureArray.map(deserializeTask)
+    );
+  }
+
+  fetchTask(taskId) {
+    return this._fetchJSON(['tasks', taskId]).then(deserializeTask);
   }
 
   createTask(taskFields) {
-    const newTask = this._db.createTask({
-      name: taskFields.name,
-      due: serializeDateTime(taskFields.due),
-      description: taskFields.description
-    });
-    return resolvingAfter(250, this.getTask(newTask.id));
+    const taskStructure = serializeTask(taskFields);
+    return this._fetchJSON(['tasks'], 'POST', taskStructure)
+      .then(deserializeTask);
   }
 
   updateTask(taskId, taskFields) {
     // TODO: Do some validation (maybe?)
-    const updated  = {
-      name: taskFields.name,
-      due: serializeDateTime(taskFields.due),
-      description: taskFields.description
-    }
-    if (this._db.updateTask(taskId, updated)) {
-      return resolvingAfter(250, null);
-    } else {
-      return rejectingAfter(150, `Failed to update task ${taskId}`);
-    }
+    const taskStructure = serializeTask(taskFields);
+    return this._fetchJSON(['tasks', taskId], 'PUT', taskStructure)
+      .then(deserializeTask);
   }
 
   deleteTask(taskId) {
-    if (this._db.deleteTask(taskId)) {
-      return resolvingAfter(250, null);
-    } else {
-      return rejectingAfter(150, `Failed to delete task ${taskId}`);
-    }
+    return this._fetchJSON(['tasks', taskId], 'DELETE');
   }
 }
 
-export { DummyAPIClient };
+export default new ApiClient();

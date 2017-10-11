@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { makeValidDateTime } from '../TimeUtil.js';
+import { unixToISO8601, makeValidUnixTime } from '../util/time.js';
 
 class DateTimeEditor extends React.Component {
   // TODO: Set a state and style this to point out invalid entry,
@@ -8,9 +8,7 @@ class DateTimeEditor extends React.Component {
   constructor(props) {
     super(props);
 
-    // FIXME: This assumes the provided date is local but it will eventually
-    //        be UTC...
-    const dateTimeString = this.props.value.format('YYYY-MM-DDTHH:mm:ss');
+    const dateTimeString = unixToISO8601(this.props.value);
     this.state = {
       initialDate: this.props.value,
       dateTimeString: dateTimeString,
@@ -24,7 +22,7 @@ class DateTimeEditor extends React.Component {
     this.setState({
       dateTimeString: newDateTimeString
     });
-    const newDateTime = makeValidDateTime(newDateTimeString);
+    const newDateTime = makeValidUnixTime(newDateTimeString);
     if (newDateTime !== null) {
       this.props.dateTimeChanged(newDateTime);
     } else {

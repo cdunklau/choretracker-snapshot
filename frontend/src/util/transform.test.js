@@ -1,4 +1,4 @@
-import { shallowCloneOmitting, shallowCloneReplacing } from './utils';
+import { shallowCloneOmitting, shallowCloneReplacing } from './transform';
 
 
 describe('shallowCloneOmitting', function() {

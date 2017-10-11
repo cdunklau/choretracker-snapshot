@@ -11,7 +11,6 @@ import DateTimeEditor from './DateTimeEditor';
 import LineEditor from './LineEditor';
 import MultilineEditor from './MultilineEditor';
 import taskActions from '../actions/taskActions';
-import notificationActions from '../actions/notificationActions';
 
 const _CREATE_MODE = 'create-mode';
 const _EDIT_MODE = 'edit-mode';
@@ -26,7 +25,7 @@ class TaskEditorImplementation extends React.Component {
         editedName: 'New task',
         editedDescription: '',
         // TODO: Decide if we really want to default to tomorrow
-        editedDue: moment().add(1, 'day'),
+        editedDue: moment().add(1, 'day').unix(),
       };
     } else {
       this._mode = _EDIT_MODE;
@@ -143,12 +142,7 @@ const TaskCreator = connect(
   function mapDispatchToProps(dispatch) {
     return {
       createTask: (taskFields) => {
-        const newTaskAction = taskActions.createTask(taskFields);
-        dispatch(newTaskAction);
-        dispatch(notificationActions.showInfoNotification(
-          `Created task ${newTaskAction.payload.task.id}`
-        ));
-        dispatch(push('/tasks/' + newTaskAction.payload.task.id));
+        dispatch(taskActions.createTask(taskFields))
       },
     };
   }
@@ -162,16 +156,12 @@ const TaskEditor = connect(
     return {
       updateTask: (taskId, taskFields) => {
         dispatch(taskActions.updateTask(taskId, taskFields));
-        dispatch(notificationActions.showInfoNotification(`Updated task ${taskId}`));
-        dispatch(push('/tasks/' + taskId));
       },
       resetTask: (taskId) => {
         dispatch(push('/tasks/' + taskId));
       },
       deleteTask: (taskId) => {
         dispatch(taskActions.deleteTask(taskId));
-        dispatch(notificationActions.showInfoNotification(`Deleted task ${taskId}`));
-        dispatch(push('/tasks'));
       },
     };
   }

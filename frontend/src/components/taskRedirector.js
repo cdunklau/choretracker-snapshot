@@ -3,7 +3,11 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
 import notificationActions from '../actions/notificationActions';
-import { getComponentDisplayName } from '../utils';
+
+
+function getComponentDisplayName(WrappedComponent) {
+  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+}
 
 function taskRedirector(TaskComponent) {
   class Wrapped extends React.Component {

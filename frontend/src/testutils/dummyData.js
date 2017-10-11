@@ -1,14 +1,8 @@
 import moment from 'moment';
-import { serializeDateTime } from './TimeUtil.js';
+import { nowUnix } from '../util/time';
 
-
-const now = moment();
-
-function todayOffsetString(offset) {
-  // FIXME: This should be converted to UTC first
-  return serializeDateTime(
-    now.clone().add(moment.duration(offset, 'days'))
-  );
+function todayOffsetUnix(offset) {
+  return moment().add(moment.duration(offset, 'days')).unix();
 }
 
 function genCrappyUUID() {
@@ -46,6 +40,7 @@ class DummyDatabase {
   constructor() {
     this._tasks = new Map();
     this._tasksOrder = [];
+    this._nextTaskIdInt = 1;
     this.getAllTasks = this.getAllTasks.bind(this);
     this.getTask = this.getTask.bind(this);
     this.createTask = this.createTask.bind(this);
@@ -65,7 +60,7 @@ class DummyDatabase {
     // Simulate GET /tasks/:id
     const task = this._tasks.get(taskId);
     if (task === undefined) {
-      return undefined;
+      return null;
     } else {
       return {...task};  // shallow copy
     }
@@ -73,31 +68,36 @@ class DummyDatabase {
 
   createTask(taskData) {
     // Simulate POST /tasks
-    const newId = genCrappyUUID();
+    const newId = this._nextTaskIdInt.toString();
+    this._nextTaskIdInt++;
     if (this._tasks.has(newId)) {
       throw new Error('Duplicate ID!');
     }
+    const now = nowUnix();
     const newTask = {
       id: newId,
       name: taskData.name,
       due: taskData.due,
-      description: taskData.description
+      description: taskData.description,
+      created: now,
+      modified: now,
     };
     this._tasksOrder.push(newId);
     this._tasks.set(newId, newTask);
-    return newTask;
+    return { ...newTask };  // Shallow copy
   }
 
   updateTask(taskId, taskData) {
     // Simulate PUT /tasks/:id
     const task = this._tasks.get(taskId);
     if (task === undefined) {
-      return false;
+      return null;
     } else {
       task.name = taskData.name;
       task.due = taskData.due;
       task.description = taskData.description;
-      return true;
+      task.modified = nowUnix();
+      return { ...task };  // Shallow copy
     }
   }
 
@@ -117,20 +117,21 @@ function genDatabase() {
   const db = new DummyDatabase();
   db.createTask({
     name: 'Clean Kitchen',
-    due: todayOffsetString(-4),
+    due: todayOffsetUnix(-4),
     description: '- Wash dishes\n- Wipe down surfaces\n- Sweep and mop'
   });
   db.createTask({
     name: 'Change Car Oil',
-    due: todayOffsetString(30),
+    due: todayOffsetUnix(30),
     description: ''
   });
   db.createTask({
     name: 'Clean Bathroom',
-    due: todayOffsetString(2),
+    due: todayOffsetUnix(2),
     description: 'Make sure to get under the toilet'
   });
+  // TODO: Add recurring tasks once that's implemented.
   return db;
 }
 
-export { genDatabase, genCrappyUUID };
+export { genDatabase, genCrappyUUID, DummyDatabase };
