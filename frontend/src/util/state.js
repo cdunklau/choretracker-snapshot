@@ -13,7 +13,7 @@ import { shallowCloneReplacing } from './transform';
  *    combineMappableReducers([
  *      {from: 'foo', via: fooReducer, to: 'foo'},
  *      {from: 'bar', via: barReducer, to: 'bar'},
- *    ], { foo: [], bar: {} })
+ *    ], { foo: [], bar: {} });
  *
  * ...except that combineReducers doesn't deal with initial state.
  *
@@ -22,12 +22,13 @@ import { shallowCloneReplacing } from './transform';
  *    combineMappableReducers([
  *      symmetricStateMapSpec('foo', fooReducer),
  *      symmetricStateMapSpec('bar', barReducer),
- *    ], { foo: [], bar: {} })
+ *    ], { foo: [], bar: {} });
  *
  * A StateMapSpec is an object containing at least a "via" property (a reducer
- * function), and optionally either or both "from" and "to" properties (which
- * describe the state key used as the input to "via" and the output state key
- * to overwrite).
+ * function), and optionally "from" and "to" properties (which describe the
+ * state key used as the input to "via" and the output state key to overwrite).
+ * It is an error for a StateMapSpec to have a defined "from" property without
+ * a defined "to" property (the converse is not an error).
  *
  * `StateMapSpec.from` is the name of the state property which will be passed
  * to the provided reducer (`StateMapSpec.via`). If `from` is null or
@@ -37,12 +38,36 @@ import { shallowCloneReplacing } from './transform';
  * the result of `StateMapSpec.via`. If it is null or undefined, `via`'s result
  * will be used as the new state (and used to produce the input of the
  * next StateMapSpec's `via` reducer).
+ *
+ * Each StateMapSpec's `via` reducer will be called in the order given, with
+ * the updated state passed along. For specs without a defined `to` (and thus
+ * without a defined `from`), the operation is simply:
+ *
+ *    nextState = spec.via(prevState, action);
+ *
+ * For specs with a defined `to`, the operation is effectively:
+ *
+ *    nextState = {
+ *      ...prevState,
+ *      [spec.to]: spec.via(
+ *        spec.from ? prevState[spec.from] : prevState,
+ *        action
+ *      ),
+ *    };
+ *
  */
 function combineMappableReducers(stateMapSpecs, initialState) {
   stateMapSpecs.forEach(function validateMapSpec(mapSpec, index) {
+    const errPrefix = `Invalid mapSpec at index ${ index }: `;
     if (typeof mapSpec.via !== 'function') {
+      throw new TypeError(errPrefix + 'property "via" is not a function');
+    }
+    if (
+      (mapSpec.from !== null && mapSpec.from !== undefined)
+      && (mapSpec.to === null || mapSpec.to === undefined)
+    ) {
       throw new TypeError(
-        `Invalid mapSpec at index ${ index }: property "via" is not a function`);
+        errPrefix + 'must provide "to" if "from" is defined');
     }
   });
   return function mainReducer(state = initialState, action) {
@@ -71,8 +96,8 @@ function combineMappableReducers(stateMapSpecs, initialState) {
 }
 
 function symmetricStateMapSpec(stateKey, viaReducer) {
-  if (typeof stateKey !== 'string') {
-    throw new TypeError('stateKey is not a string');
+  if (typeof stateKey !== 'string' && stateKey !== null && stateKey !== undefined) {
+    throw new TypeError('stateKey must be a string, null, or undefined');
   }
   if (typeof viaReducer !== 'function') {
     throw new TypeError('viaReducer is not a function');
