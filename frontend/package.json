@@ -1,4 +1,9 @@
 {
+  "proxy": {
+    "/apis": {
+      "target": "http://localhost:8080"
+    }
+  },
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
@@ -6,8 +11,8 @@
     "history": "^4.7.2",
     "moment": "^2.18.1",
     "prop-types": "^15.5.10",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
+    "react": "^15.6.2",
+    "react-dom": "^15.6.2",
     "react-redux": "^5.0.6",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
@@ -23,6 +28,10 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "enzyme": "^3.1.0",
+    "enzyme-adapter-react-15": "^1.0.1",
+    "jest-fetch-mock": "^1.2.1",
+    "react-test-renderer": "^15.6.2",
     "redux-devtools": "^3.4.0"
   }
 }

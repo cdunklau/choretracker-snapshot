@@ -76,22 +76,49 @@ To Do
 Short-term
 ++++++++++
 
--   Condense various utility modules into ./src/utils/
--   Update UI to display creation/modification timestamps.
--   Add "state" field to tasks. Call it "completed" or something, or do we also
-    want to support in-progress? Calling it "status" and making it an enum
-    would make that feature nicer.
--   Add tests (unit and behavioral).
+-   Finish adding taskGroup handling to frontend and add the task_group
+    collection GET handler on the backend.
+-   Figure out a way to turn the frontend API client mock on and off
+    in a nicer way.
+-   Add polyfills for Object.values and Array.from.
+-   Add more tests (unit and behavioral).
 -   Publish to github.
 
 Mid-term
 +++++++++
 
--   Start work on backend.
+-   Update UI to display creation/modification timestamps.
+-   Add "state" field to tasks. Call it "completed" or something, or do we also
+    want to support in-progress? Calling it "status" and making it an enum
+    would make that feature nicer.
 -   Integrate a CSS framework (with SASS support).
--   Implement auth: Google, Facebook, username/password
+-   Implement auth:
+    `Google <https://developers.google.com/identity/protocols/OpenIDConnect>`_,
+    Facebook, username/password
 
 Long-term
 +++++++++
 
--   Figure out and implement repeating tasks
+-   Review compatibility with browsers and provide polyfills as necessary.
+-   Figure out and implement repeating tasks.
+-   Support drafts: unsaved tasks saved in browser localStorage.
+
+
+Feature Tests To Do
+===================
+
+These should be tested with selenium or similar, without any mocks/fakes/etc.
+
+-   If the page is reloaded and a specific task is requested by the url,
+    the application requests the task by ID directly to see if it exists
+    before redirecting.
+
+-   If a task is near the boundry of a different due category and the current
+    time changes so that it should now be in a different category, the UI
+    updates the color marking that task in TaskList, and the counts in the
+    TasksDueStatusSummary, within TimeReferenceUpdater.intervalSeconds of the
+    time change.
+
+-   (requires websocket stuff) When one user creates, updates, or deletes a
+    task, other user sessions shortly thereafter display the modification
+    without reloading the page.

@@ -1,9 +1,5 @@
-import moment from 'moment';
 import { nowUnix } from '../util/time';
-
-function todayOffsetUnix(offset) {
-  return moment().add(moment.duration(offset, 'days')).unix();
-}
+import { dbFixtures } from './fixtures';
 
 function genCrappyUUID() {
   // IMPORTANT: DON'T ACTUALLY USE THIS FOR ANYTHING REAL
@@ -76,6 +72,7 @@ class DummyDatabase {
     const now = nowUnix();
     const newTask = {
       id: newId,
+      taskGroup: taskData.taskGroup,
       name: taskData.name,
       due: taskData.due,
       description: taskData.description,
@@ -93,6 +90,7 @@ class DummyDatabase {
     if (task === undefined) {
       return null;
     } else {
+      task.taskGroup = taskData.taskGroup;
       task.name = taskData.name;
       task.due = taskData.due;
       task.description = taskData.description;
@@ -113,24 +111,10 @@ class DummyDatabase {
   }
 }
 
-function genDatabase() {
+function genDatabase(fixtureName = 'realistic') {
   const db = new DummyDatabase();
-  db.createTask({
-    name: 'Clean Kitchen',
-    due: todayOffsetUnix(-4),
-    description: '- Wash dishes\n- Wipe down surfaces\n- Sweep and mop'
-  });
-  db.createTask({
-    name: 'Change Car Oil',
-    due: todayOffsetUnix(30),
-    description: ''
-  });
-  db.createTask({
-    name: 'Clean Bathroom',
-    due: todayOffsetUnix(2),
-    description: 'Make sure to get under the toilet'
-  });
-  // TODO: Add recurring tasks once that's implemented.
+  const installFixture = dbFixtures.get(fixtureName);
+  installFixture(db);
   return db;
 }
 

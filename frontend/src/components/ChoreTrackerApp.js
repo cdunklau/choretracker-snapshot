@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import { TaskCreator, RedirectingTaskEditor } from './TaskEditor';
 import { RedirectingTaskDetails } from './TaskDetails';
@@ -78,14 +78,17 @@ function ChoreTrackerApp(props) {
 
       <Notifications/>
 
-      <Route exact path="/tasks" component={ TaskList } />
-      <Route exact path="/tasks/new" component={ TaskCreator } />
-      <Route
-        exact path={ `/tasks/:taskId(${ intIdPattern })` }
-        component={ RedirectingTaskDetails } />
-      <Route
-        exact path={ `/tasks/:taskId(${ intIdPattern })/edit` }
-        component={ RedirectingTaskEditor } />
+      <Switch>
+        <Route exact path="/tasks" component={ TaskList } />
+        <Route exact path="/tasks/new" component={ TaskCreator } />
+        <Route
+          exact path={ `/tasks/:taskId(${ intIdPattern })` }
+          component={ RedirectingTaskDetails } />
+        <Route
+          exact path={ `/tasks/:taskId(${ intIdPattern })/edit` }
+          component={ RedirectingTaskEditor } />
+        { /* TODO: Add a NotFound component */ }
+      </Switch>
     </div>
   );
 }

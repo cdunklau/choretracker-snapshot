@@ -14,9 +14,11 @@ function makeValidUnixTime(isoTimestamp) {
   return null;
 }
 
+const momentISO8601FormatString = 'YYYY-MM-DDTHH:mm:ss';
+
 // Number -> String
 function unixToISO8601(unixTimestampSeconds) {
-  return moment.unix(unixTimestampSeconds).format('YYYY-MM-DDTHH:mm:ss');
+  return moment.unix(unixTimestampSeconds).format(momentISO8601FormatString);
 }
 
 // String -> Number
@@ -28,4 +30,10 @@ function nowUnix() {
   return moment().unix();
 }
 
-export { makeValidUnixTime, unixToISO8601, iso8601ToUnix, nowUnix };
+export {
+  makeValidUnixTime,
+  momentISO8601FormatString,
+  unixToISO8601,
+  iso8601ToUnix,
+  nowUnix
+};

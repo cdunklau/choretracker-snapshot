@@ -1,0 +1,66 @@
+<html>
+
+<head>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+
+<body>
+  <button id="google-signin-button">Sign In With Google</button>
+
+  <button id="google-revoke-button">Revoke Access</button>
+
+  <script>
+  window.onload = function() {
+    function onGoogleSignInSuccess(googleUser) {
+      const profile = googleUser.getBasicProfile();
+      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+      console.log('sending id token to backend');
+      const data = JSON.stringify({
+        idtoken: googleUser.getAuthResponse().id_token
+      });
+      const headers = new Headers();
+      headers.append('Content-Type', 'application/json')
+      fetch('/googleauthtoken', {
+        method: 'POST',
+        body: data,
+        headers: headers,
+      }).then(function(response) {
+        if (response.ok) {
+          return response.json();
+        } else {
+          return Promise.reject(new Error('Bad return code from api ' + response.status));
+        }
+      }).then(console.log.bind(console), console.log.bind(console));
+    }
+    function onGoogleSignInFailure(error) {
+      console.log('Failed to sign on', error);
+    }
+    gapi.load('auth2', function(){
+        /**
+         * Retrieve the singleton for the GoogleAuth library and set up the
+         * client.
+         */
+        const auth2 = gapi.auth2.init({
+          client_id: "%%%REPLACE_WITH_CLIENT_ID%%%",
+        });
+
+        // Attach the click handler to the sign-in button
+        auth2.attachClickHandler(
+          document.getElementById('google-signin-button'),
+          {}, onGoogleSignInSuccess, onGoogleSignInFailure);
+
+        document.getElementById('google-revoke-button')
+        .addEventListener('click', function() {
+            auth2.disconnect();
+        });
+    });
+  };
+  </script>
+
+</body>
+
+</html>

@@ -2,22 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TaskEditor from './TaskEditor';
 
+describe('TaskEditor', () => {
+  it.skip('displays an error message when an invalid datetime is input', () => {
+  });
 
-function makeRenderer(element) {
-  const div = document.createElement('div');
-  return () => { ReactDOM.render(element, div); };
-}
-
-it(
-  'throws when a task is provided without requestSave and requestDelete props',
-  () => {
-    expect(makeRenderer(<TaskEditor task={ {} } />)).toThrowError(TypeError);
-  }
-);
-
-it(
-  'throws when a no task is provided without a requestCreate prop',
-  () => {
-    expect(makeRenderer(<TaskEditor />)).toThrowError(TypeError);
-  }
-);
+  it.skip('disallows submit when an invalid datetime is input', () => {
+  });
+});

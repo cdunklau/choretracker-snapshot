@@ -5,10 +5,10 @@ export default function makeInitialState() {
   return {
     tasksById: {},
     tasksOrderedByDue: [],
+    // TODO: Do I need lastTaskAction???
     lastTaskAction: {},
     // A notification has id and message properties
     notifications: [],
     timeReference: now,
-    router: undefined,  // taken care of by routerReducer
   };
 };

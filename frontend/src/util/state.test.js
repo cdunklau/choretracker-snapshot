@@ -1,17 +1,18 @@
-import { combineMappableReducers, symmetricStateMapSpec } from './state';
+import {
+  composeMappableReducers, symmetricStateMapSpec, composeReducers
+} from './state';
 
-
-describe('The reducer returned by combineMappableReducers', () => {
+describe('The reducer returned by composeMappableReducers', () => {
 
   it('returns initialState directly in the trivial case', () => {
     const initialState = {};
-    const reducer = combineMappableReducers([], initialState);
+    const reducer = composeMappableReducers([], initialState);
     expect(reducer()).toBe(initialState);
   });
 
   it('returns initialState directly if all the subreducers do', () => {
     const initialState = {};
-    const reducer = combineMappableReducers([
+    const reducer = composeMappableReducers([
       { from: null, via: (state, action) => state, to: null },
       symmetricStateMapSpec(null, (state, action) => state),
     ], initialState);
@@ -26,7 +27,7 @@ describe('The reducer returned by combineMappableReducers', () => {
       { from: 'foo', via: whateverReducer, to: undefined },
     ];
     badSpecs.forEach(spec => {
-      expect(() => { combineMappableReducers([ spec ], {}) })
+      expect(() => { composeMappableReducers([ spec ], {}) })
         .toThrow(
           'Invalid mapSpec at index 0: must provide "to" if "from" is defined'
         );
@@ -42,7 +43,7 @@ describe('The reducer returned by combineMappableReducers', () => {
     ];
     badSpecs.forEach(spec => {
       expect(() => {
-        combineMappableReducers([ spec ], {});
+        composeMappableReducers([ spec ], {});
       }).toThrow(/property "via" is not a function/);
     });
   });
@@ -66,7 +67,7 @@ describe('The reducer returned by combineMappableReducers', () => {
         return number;
       }
     }
-    const reducer = combineMappableReducers([
+    const reducer = composeMappableReducers([
       symmetricStateMapSpec('adding', addReducer),
       symmetricStateMapSpec('doubling', doubleReducer),
     ], initialState);
@@ -104,7 +105,7 @@ describe('The reducer returned by combineMappableReducers', () => {
           return state.result;
       }
     }
-    const reducer = combineMappableReducers([
+    const reducer = composeMappableReducers([
       symmetricStateMapSpec(null, setReducer),
       { from: null, via: calcResultReducer, to: 'result' },
     ], initialState);
@@ -128,7 +129,7 @@ describe('The reducer returned by combineMappableReducers', () => {
     function makeLetterAppenderReducer(letter) {
       return (state, action) => ({ letters: [ ...state.letters, letter ] });
     }
-    let reducer = combineMappableReducers([
+    let reducer = composeMappableReducers([
       symmetricStateMapSpec(null, makeLetterAppenderReducer('a')),
       symmetricStateMapSpec(null, makeLetterAppenderReducer('b')),
       symmetricStateMapSpec(null, makeLetterAppenderReducer('c')),
@@ -145,7 +146,7 @@ describe('The reducer returned by combineMappableReducers', () => {
     function makeAppenderReducer(value) {
       return (values, action) => [ ...values, value ];
     }
-    let reducer = combineMappableReducers([
+    let reducer = composeMappableReducers([
       symmetricStateMapSpec('numbers', makeAppenderReducer(1)),
       symmetricStateMapSpec('numbers', makeAppenderReducer(2)),
       symmetricStateMapSpec('numbers', makeAppenderReducer(3)),

@@ -4,22 +4,24 @@ import { shallowCloneReplacing } from './transform';
  * Create a reducer from an array of "StateMapSpec" objects and the initial
  * state object.
  *
- * This functionality is a superset of redux.combineReducers:
+ * This functionality is a rough superset of redux.combineReducers:
  *
  *    combineReducers({ foo: fooReducer, bar: barReducer})
  *
  * is equivalent to:
  *
- *    combineMappableReducers([
+ *    composeMappableReducers([
  *      {from: 'foo', via: fooReducer, to: 'foo'},
  *      {from: 'bar', via: barReducer, to: 'bar'},
  *    ], { foo: [], bar: {} });
  *
- * ...except that combineReducers doesn't deal with initial state.
+ * ...except that combineReducers doesn't deal with initial state, and it
+ * updates the state in one shot, whereas composeMappableReducers passes the
+ * state object returned by the first child reducer along to the second.
  *
  * Using the helper, the above can be simplified to:
  *
- *    combineMappableReducers([
+ *    composeMappableReducers([
  *      symmetricStateMapSpec('foo', fooReducer),
  *      symmetricStateMapSpec('bar', barReducer),
  *    ], { foo: [], bar: {} });
@@ -56,7 +58,7 @@ import { shallowCloneReplacing } from './transform';
  *    };
  *
  */
-function combineMappableReducers(stateMapSpecs, initialState) {
+function composeMappableReducers(stateMapSpecs, initialState) {
   stateMapSpecs.forEach(function validateMapSpec(mapSpec, index) {
     const errPrefix = `Invalid mapSpec at index ${ index }: `;
     if (typeof mapSpec.via !== 'function') {
@@ -70,7 +72,7 @@ function combineMappableReducers(stateMapSpecs, initialState) {
         errPrefix + 'must provide "to" if "from" is defined');
     }
   });
-  return function mainReducer(state = initialState, action) {
+  return function composed(state = initialState, action) {
     for (const mapSpec of stateMapSpecs) {
       let input;
       if (mapSpec.from === null || mapSpec.from === undefined) {
@@ -109,4 +111,4 @@ function symmetricStateMapSpec(stateKey, viaReducer) {
   };
 }
 
-export { combineMappableReducers, symmetricStateMapSpec };
+export { composeMappableReducers, symmetricStateMapSpec };

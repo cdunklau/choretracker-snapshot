@@ -15,6 +15,8 @@ import taskActions from '../actions/taskActions';
 const _CREATE_MODE = 'create-mode';
 const _EDIT_MODE = 'edit-mode';
 
+// TODO: Expose this as TaskEditor
+
 class TaskEditorImplementation extends React.Component {
   constructor(props) {
     super(props);
@@ -30,11 +32,14 @@ class TaskEditorImplementation extends React.Component {
     } else {
       this._mode = _EDIT_MODE;
       this.state = {
+        editedTaskGroup: this.props.task.taskGroup,
         editedName: this.props.task.name,
         editedDescription: this.props.task.description,
         editedDue: this.props.task.due,
       };
     }
+    // TODO: Add handleChangedTaskGroup once that part of the state tree
+    //       has been added.
     this.handleChangedDue = this.handleChangedDue.bind(this);
     this.handleNameInput = this.handleNameInput.bind(this);
     this.handleDescriptionInput = this.handleDescriptionInput.bind(this);
@@ -47,6 +52,9 @@ class TaskEditorImplementation extends React.Component {
     this.setState({
       editedDue: newDue
     });
+  }
+  // TODO: Implement handleInvalidDue
+  handleInvalidDue(whyInvalid) {
   }
 
   handleNameInput(nameText) {
@@ -63,6 +71,7 @@ class TaskEditorImplementation extends React.Component {
 
   saveEdits() {
     const taskFields = {
+      taskGroup: this.state.editedTaskGroup,
       name: this.state.editedName,
       due: this.state.editedDue,
       description: this.state.editedDescription,
@@ -114,7 +123,8 @@ class TaskEditorImplementation extends React.Component {
         <p>
           Due on <DateTimeEditor
             value={ this.state.editedDue }
-            dateTimeChanged={ this.handleChangedDue } />
+            onValid={ this.handleChangedDue }
+            onInvalid={ this.handleInvalidDue } />
         </p>
         <MultilineEditor
           value={ this.state.editedDescription }

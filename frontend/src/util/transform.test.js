@@ -1,5 +1,6 @@
-import { shallowCloneOmitting, shallowCloneReplacing } from './transform';
-
+import {
+  shallowCloneOmitting, shallowCloneReplacing, objectFromArray
+} from './transform';
 
 describe('shallowCloneOmitting', function() {
   const obj = {a: 1, b: 2};
@@ -28,5 +29,18 @@ describe('shallowCloneReplacing', function() {
   });
   it('does not mutate the original', function() {
     expect(obj).toEqual({a: 1, b: 2});
+  });
+});
+
+describe('objectFromArray', function() {
+  it('does its job', function() {
+    const models = [
+      { name: 'foo', id: 8 },
+      { name: 'bar', id: 1 },
+      { name: 'baz', id: 4 },
+    ];
+    function getNameThenValue(item) { return [ item.name, item.id ] }
+    const expectedObj = { foo: 8, bar: 1, baz: 4 };
+    expect(objectFromArray(models, getNameThenValue)).toEqual(expectedObj);
   });
 });

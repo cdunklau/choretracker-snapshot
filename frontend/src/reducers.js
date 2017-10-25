@@ -1,6 +1,4 @@
-import { routerReducer } from 'react-router-redux';
-
-import { combineMappableReducers, symmetricStateMapSpec } from './util/state';
+import { composeMappableReducers, symmetricStateMapSpec } from './util/state';
 import ActionTypes from './actions/ActionTypes';
 import {
   shallowCloneOmitting, shallowCloneReplacing, objectFromArray
@@ -9,22 +7,27 @@ import makeInitialState from './makeInitialState';
 
 const initialState = makeInitialState();
 
-const rootReducer = combineMappableReducers([
+const rootReducer = composeMappableReducers([
   symmetricStateMapSpec('tasksById', changedTasks),
-  {
-    from: 'tasksById',
-    via: computeOrderedByDue,
-    to: 'tasksOrderedByDue',
-  },
+  symmetricStateMapSpec(null, computeOrderedByDue),
   symmetricStateMapSpec('notifications', computeNotifications),
   symmetricStateMapSpec('timeReference', updateTimeReference),
-  symmetricStateMapSpec('router', routerReducer),
 ], initialState);
 
-function computeOrderedByDue(tasksById) {
-  // TODO: Reduce this churn by only triggering on relevant action types.
-  return Object.keys(tasksById)
-    .sort((id1, id2) => compareTaskByDue(tasksById, id1, id2));
+function computeOrderedByDue(state, action) {
+  switch (action.type) {
+    case ActionTypes.DELETE_TASK_SUCCESS:
+    case ActionTypes.CREATE_TASK_SUCCESS:
+    case ActionTypes.UPDATE_TASK_SUCCESS:
+    case ActionTypes.FETCH_TASK_SUCCESS:
+    case ActionTypes.FETCH_ALL_TASKS_SUCCESS:
+      const tasksOrderedByDue = Object.keys(state.tasksById)
+        .sort((id1, id2) => compareTaskByDue(state.tasksById, id1, id2));
+      return shallowCloneReplacing(
+        state, 'tasksOrderedByDue', tasksOrderedByDue);
+    default:
+      return state;
+  }
 }
 
 function compareTaskByDue(tasksById, id1, id2) {
@@ -74,4 +77,8 @@ function updateTimeReference(timeReference, action) {
   }
 }
 
-export { rootReducer };
+export const _forTesting = {
+  changedTasks,
+  computeOrderedByDue,
+};
+export default rootReducer;
