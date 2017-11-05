@@ -76,12 +76,22 @@ To Do
 Short-term
 ++++++++++
 
+-   Add Task Groups to backend.
 -   Finish adding taskGroup handling to frontend and add the task_group
-    collection GET handler on the backend.
+    collection GET handler on the backend. (Maybe this is done already?)
+-   Implement signon and profile on frontend. App should:
+    -   Initially request /apis/profile to see if the user is logged in...
+    -   If 403, display login page, then after login...
+    -   Check if successful /apis/profile reponse shows that the user
+        has a profile (it will 404 if not).
+    -   If no profile, display profile edit page, otherwise display
+        task groups page.
+-   Set up SQLAlchemy migrations and a CLI tool to apply them.
 -   Figure out a way to turn the frontend API client mock on and off
     in a nicer way.
 -   Add polyfills for Object.values and Array.from.
 -   Add more tests (unit and behavioral).
+-   Add docstrings for all settled classes and functions.
 -   Publish to github.
 
 Mid-term
@@ -92,9 +102,7 @@ Mid-term
     want to support in-progress? Calling it "status" and making it an enum
     would make that feature nicer.
 -   Integrate a CSS framework (with SASS support).
--   Implement auth:
-    `Google <https://developers.google.com/identity/protocols/OpenIDConnect>`_,
-    Facebook, username/password
+-   Implement additional auth methods: Facebook, maybe username/password
 
 Long-term
 +++++++++

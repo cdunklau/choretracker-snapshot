@@ -1,6 +1,9 @@
 """
 Application models and marshmallow schemas for deserializing
-client-provided JSON.
+client-provided JSON into models.
+
+The names of the fields match the database table columns to make
+`SomeModel(**databaseRow)` possible.
 """
 import attr
 import marshmallow as mm
@@ -19,6 +22,45 @@ def _UnixTimeInteger(**kwargs):
     return mm.fields.Integer(
         validate=mm.validate.Range(min=0, max=_LAST_UNIX),
         **kwargs)
+
+
+@attr.s
+class UserProfile:
+    """
+    User details that are unrelated to authentication.
+    """
+    email = attr.ib()
+    display_name = attr.ib()
+    user_id = attr.ib(default=None)
+    email_verified = attr.ib(default=False)
+
+
+class UserProfileSchema(mm.Schema):
+    email = mm.fields.String(
+        required=True,
+        validate=mm.validate.Email())
+    display_name = mm.fields.String(
+        required=True,
+        load_from='displayName',
+        dump_to='displayName',
+        validate=mm.validate.Regexp(r'^\S.*\S$'))
+    user_id = mm.fields.Integer(
+        dump_only=True,
+        dump_to='userId')
+    email_verified = mm.fields.Boolean(
+        dump_only=True,
+        dump_to='emailVerified')
+
+    # Make sure the input to dump() is an attrs class instance
+    # (attr.asdict will throw if it's not).
+    @mm.pre_dump
+    def deserialize_user_profile(self, user):
+        return attr.asdict(user)
+
+    @mm.post_load
+    def make_user_profile(self, validated):
+        return UserProfile(**validated)
+
 
 @attr.s
 class Task:

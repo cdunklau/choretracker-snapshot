@@ -9,11 +9,14 @@ name = "pypi"
 
 sqlalchemy = ">=1.1,<1.2"
 alembic = ">=0.9,<1.0"
-aiohttp = ">=2.3,<2.4"
-asyncpg = ">=0.12,<0.13"
 click = ">=5.0,<6.0"
 attrs = ">=17.0,<18.0"
 marshmallow = ">=2.13,<2.14"
+twisted = ">=17.9"
+"psycopg2" = ">=2.7"
+klein = ">=17.10"
+google-auth = "*"
+treq = "*"
 
 
 [dev-packages]

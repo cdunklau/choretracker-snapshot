@@ -46,10 +46,12 @@ class GoogleSignInValidator:
         return self._request_fake
 
     async def validate_user_id_from_token(self, token):
+        started = time.monotonic()
         certs_request_fake = await self._make_google_auth_certs_request_fake()
         try:
             idinfo = google_id_token.verify_oauth2_token(
                 token, certs_request_fake, self._google_app_client_id)
+            duration = time.monotonic() - started
 
             if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
                 raise ValueError('Wrong issuer.')
@@ -63,6 +65,7 @@ class GoogleSignInValidator:
         except ValueError as e:
             raise InvalidToken(e)
 
+        log.debug('verification took {0:.3g} milliseconds'.format(duration * 1000))
         return userid
 
 
@@ -112,7 +115,6 @@ async def handle_auth_token(request):
         log.exception('failed to validate idtoken')
         return server.Response(status=400)
 
-    log.info('token is valid, user id is {0!r}'.format(user_id))
     return server.json_response({'validated_user_id': user_id})
 
 

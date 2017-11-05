@@ -10,5 +10,11 @@ export default function makeInitialState() {
     // A notification has id and message properties
     notifications: [],
     timeReference: now,
+    // TODO: Add task groups
+    taskGroupsById: {},
+    // TODO: Add user profile
+    userProfile: {},
+    // TODO: Maybe add some mark about auth status?
+    successfullyAuthenticated: false,
   };
 };

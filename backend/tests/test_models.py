@@ -1,4 +1,4 @@
-from choretracker_backend import models
+from txchoretracker import models
 
 _day = 24 * 60 * 60
 CREATED = 1489453509
@@ -15,7 +15,7 @@ class TestTaskSchema:
             task_group_id=2,
             name=NAME,
             description=DESCRIPTION,
-            due=DUE,
+            due_unix=DUE,
             created_unix=CREATED,
             modified_unix=MODIFIED,
         )
@@ -23,10 +23,10 @@ class TestTaskSchema:
         result, errors = schema.dump(task)
         expected = {
             'id': 1,
-            'task_group': 2,  # No _id
+            'taskGroup': 2,  # No _id, camelCased
             'name': NAME,
             'description': DESCRIPTION,
-            'due': DUE,
+            'due': DUE, # No _unix
             'created': CREATED,  # No _unix
             'modified': MODIFIED,  # No _unix
         }
@@ -36,7 +36,7 @@ class TestTaskSchema:
     def test_deserializes_correctly(self):
         json_structure = {
             'id': 1,
-            'task_group': 2,
+            'taskGroup': 2,
             'name': 'some name',
             'description': 'some description',
             'due': DUE,
@@ -50,7 +50,25 @@ class TestTaskSchema:
             task_group_id=2,
             name=NAME,
             description=DESCRIPTION,
-            due=DUE,
+            due_unix=DUE,
+        )
+        assert not errors
+        assert result == expected
+
+
+class TestUserProfileSchema:
+    def test_deserializes_correctly(self):
+        json_structure = {
+            'email': 'tgilliam@example.com',
+            'displayName': 'Terry Gilliam',
+            'userId': 123,  # Ignored
+            'emailVerified': True,  # Ignored
+        }
+        schema = models.UserProfileSchema(strict=True, partial=False)
+        result, errors = schema.load(json_structure)
+        expected = models.UserProfile(
+            email='tgilliam@example.com',
+            display_name='Terry Gilliam',
         )
         assert not errors
         assert result == expected

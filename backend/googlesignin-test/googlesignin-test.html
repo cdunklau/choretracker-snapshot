@@ -46,6 +46,7 @@
          */
         const auth2 = gapi.auth2.init({
           client_id: "%%%REPLACE_WITH_CLIENT_ID%%%",
+          fetch_basic_profile: true,
         });
 
         // Attach the click handler to the sign-in button

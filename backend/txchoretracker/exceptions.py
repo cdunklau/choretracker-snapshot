@@ -10,3 +10,9 @@ class UserNotInRequestedTaskGroup(ChoreTrackerException):
 
 class NoSuchTask(ChoreTrackerException):
     pass
+
+class NoSuchUser(ChoreTrackerException):
+    pass
+
+class NoProfileForUser(ChoreTrackerException):
+    pass
